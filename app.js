@@ -3,6 +3,8 @@ const dotenv = require('dotenv')
 const writeEventLog = require('./writeEventLog')
 const { parseExerciseBody } = require('./logic/exerciseFunctions')
 const exerciseRoutes = require('./routes/exerciseRoutes.js')
+const exerciseListRoutes = require('./routes/exerciseList')
+const authRoutes = require('./routes/authRoutes')
 
 dotenv.config()
 
@@ -12,8 +14,8 @@ const port = process.env.PORT || 3000
 app.use(express.json())
 
 
-
-
+app.use('/auth', authRoutes)
+app.use('/exercise', exerciseListRoutes)
 app.use('/activity', exerciseRoutes)
 
 app.get('/*', (req,res) => {

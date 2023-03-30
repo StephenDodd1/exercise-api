@@ -1,1 +1,1 @@
-{"exercises":[{"start":1679883802,"stop":1679884082,"first_name":"J","last_name":"K","distance":0,"steps":0,"exercise":"Running","id":0},{"start":1679883802,"stop":1679884082,"first_name":"L","last_name":"J","distance":1.2,"steps":1000,"exercise":"Swimming","id":1}]}
+{"exercises":[{"start":1679883802,"stop":1679884082,"user_id": 0,"distance":0,"steps":0,"exercise":"Running","id":0},{"start":1679883802,"stop":1679884082,"user_id": 0,"distance":1.2,"steps":1000,"exercise":"Swimming","id":1}]}

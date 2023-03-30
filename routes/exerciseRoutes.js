@@ -1,30 +1,44 @@
 const express = require('express')
+const { verifySession } = require('../logic/authFunctions')
 const { getDuration, getPublicName } = require('../logic/commonFunctions')
 const { parseExerciseBody, parseUpdateBody } = require('../logic/exerciseFunctions')
 const readExercise = require('../store/readExercise')
+const readUser = require('../store/readUser')
 const writeExercise = require('../store/writeExercise')
 const router = express.Router()
 
-// Get a previous exercise session
-router.get('/:session_id', async (req,res)=>{
-    const dataString = await readExercise()
-    const dataJson = JSON.parse(dataString)
-    console.log(req.params.session_id, dataJson.exercises[0].id)
-    const sessionById = dataJson.exercises.filter(session => 
-        parseInt(req.params.session_id) === session.id)[0]
-    // Here we use the start and stop time to create the session length.
-    const duration = getDuration(sessionById.start,sessionById.stop)
-    const publicName = getPublicName(sessionById.first_name,sessionById.last_name)
-    sessionById.duration = duration
-    sessionById.publicName = publicName
-    const startTimeFormatted = new Date(sessionById.start*1000)
-    sessionById.start = startTimeFormatted.toLocaleString()
-    delete sessionById.stop
-    res.send(sessionById)
+// Get a previous exercise activity
+router.get('/:activity_id', async (req,res)=>{
+    const verified = verifySession(req.headers.authorization.split(' ')[1])
+    if(!verified){
+        return res.send('JWT Expired')
+    }
+    console.log('verified', verified)
+    const exerciseString = await readExercise()
+    const exerciseJson = JSON.parse(exerciseString)
+    const userString = await readUser()
+    const userJson = JSON.parse(userString)
+    const user = userJson.users.filter(user=> user.username === verified.user)[0]
+    const id = user.id
+    let activityById = exerciseJson.exercises.filter(activity => 
+        (parseInt(req.params.activity_id) === activity.id) &&
+        (id === activity.user_id))
+    if(activityById.length){
+        activityById = activityById[0]
+    }
+    // Here we use the start and stop time to create the activity length.
+    const duration = getDuration(activityById.start,activityById.stop)
+    const publicName = getPublicName(user.given,user.surname)
+    activityById.duration = duration
+    activityById.publicName = publicName
+    const startTimeFormatted = new Date(activityById.start*1000)
+    activityById.start = startTimeFormatted.toLocaleString()
+    delete activityById.stop
+    res.send(activityById)
 })
 
-// Post a new exercise session
-// A session refers to a user-defined activity
+// Post a new exercise activity
+// A activity refers to a user-defined activity
 router.post('/new', async (req, res) =>{
     const body = req.body
     const currentString = await readExercise()
@@ -36,11 +50,11 @@ router.post('/new', async (req, res) =>{
     res.send(exercises)
 })
 
-router.patch('/progress/:session_id', async (req, res) =>{
-    const updatedSession = await parseUpdateBody(req.body, req.params.session_id)
-    console.log('updatedSession ',updatedSession)
-    if(updatedSession !== 'error'){
-        res.send(updatedSession)}
+router.patch('/progress/:activity_id', async (req, res) =>{
+    const updatedActivity = await parseUpdateBody(req.body, req.params.activity_id)
+    console.log('updatedActivity ',updatedActivity)
+    if(updatedActivity !== 'error'){
+        res.send(updatedActivity)}
 })
 
 module.exports = router

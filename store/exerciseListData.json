@@ -1,0 +1,1 @@
+{"exercises": {"swim": ["distance"], "run": ["steps","distance", "incline","decline"], "yoga":["interval","count"], "weights":["sets","reps"]}}

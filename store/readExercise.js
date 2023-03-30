@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-const readExercise =() =>{
+const readExercise = () =>{
     return fs.promises.readFile('./store/exerciseData.json', 'utf-8', (err, data) =>{
         if(!err){
             console.log('test data',data)
